@@ -1,0 +1,30 @@
+---
+description: Guidelines for Azure Functions implementation and API design
+globs: functions/**/*.{py,json,js,ts}, api/**/*.{py,json,js,ts}
+alwaysApply: false
+---
+# Azure Functions Guidelines
+
+- **Function Design**:
+  - Create single-purpose functions following SOLID principles.
+  - Use appropriate trigger types (HTTP, Blob, Queue) based on function purpose.
+  - Implement proper input validation for all parameters.
+  - Use dependency injection for testability.
+
+- **API Structure**:
+  - Design RESTful APIs with consistent naming conventions.
+  - Implement proper HTTP status codes and error responses.
+  - Use JSON schema validation for request/response payloads.
+  - Include rate limiting and throttling mechanisms.
+
+- **Performance Optimization**:
+  - Minimize cold starts with consumption plan.
+  - Implement connection pooling for database/service connections.
+  - Use appropriate caching strategies (distributed cache recommended).
+  - Optimize memory usage with proper resource cleanup.
+
+- **Error Handling**:
+  - Implement comprehensive try/except blocks with specific exceptions.
+  - Log detailed error information with correlation IDs.
+  - Return user-friendly error messages with actionable guidance.
+  - Implement circuit breakers for external service calls.

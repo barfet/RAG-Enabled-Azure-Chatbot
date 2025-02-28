@@ -1,0 +1,31 @@
+---
+description: Guidelines for vector search implementation and RAG pattern
+globs: functions/search/**/*.{py,json}, functions/rag/**/*.{py,json}
+alwaysApply: false
+---
+# Vector Search and RAG Guidelines
+
+- **Azure Cognitive Search**:
+  - Configure HNSW algorithm with parameters: m=4, efConstruction=400, efSearch=500.
+  - Set up vector dimension to match embedding model (1536 for ada-002).
+  - Implement hybrid search combining vector + keyword search.
+  - Include filters for document metadata and permissions.
+
+- **Query Processing**:
+  - Generate embeddings for user queries using same model as documents.
+  - Implement query preprocessing to improve search effectiveness.
+  - Support different query types (factual, conversational, etc.).
+  - Maintain conversation context for follow-up questions.
+
+- **Relevance Tuning**:
+  - Optimize top-k parameter (3-5 recommended for chat responses).
+  - Apply reranking for hybrid search results.
+  - Use semantic similarity threshold to filter low-relevance results.
+  - Consider document recency and authority in ranking.
+
+- **RAG Implementation**:
+  - Construct effective prompts with retrieved context.
+  - Format context to highlight most relevant information.
+  - Include source attribution in prompt structure.
+  - Set appropriate temperature (0.3-0.7) based on query type.
+  - Implement fallback mechanisms when relevant content isn't found.

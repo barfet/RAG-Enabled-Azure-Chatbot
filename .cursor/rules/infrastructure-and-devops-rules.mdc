@@ -1,0 +1,30 @@
+---
+description: Guidelines for infrastructure provisioning and DevOps practices
+globs: infra/**/*.{json,bicep,tf,yaml,yml}, .github/**/*.{yml,yaml}
+alwaysApply: false
+---
+# Infrastructure and DevOps Guidelines
+
+- **Resource Provisioning**:
+  - Use Infrastructure as Code (Bicep or Terraform) for all resources.
+  - Apply consistent naming conventions and tagging.
+  - Configure proper resource sizing based on expected load.
+  - Enable diagnostic settings for all resources.
+
+- **CI/CD Pipeline**:
+  - Implement trunk-based development workflow.
+  - Run automated tests for all pull requests.
+  - Use staging environments for pre-production validation.
+  - Implement blue-green deployment for zero-downtime updates.
+
+- **Monitoring and Alerting**:
+  - Configure Application Insights for all components.
+  - Set up alerts for critical performance metrics.
+  - Implement custom telemetry for business metrics.
+  - Create operational dashboards for system health.
+
+- **Disaster Recovery**:
+  - Implement regular backups for all data sources.
+  - Configure geo-redundancy for critical services.
+  - Document and test recovery procedures.
+  - Set clear RPO and RTO objectives.

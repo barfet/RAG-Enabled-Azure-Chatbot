@@ -1,0 +1,30 @@
+---
+description: Security and compliance guidelines for the RAG chatbot
+globs: **/*.{py,ts,js,jsx,tsx,json,yml,yaml,bicep}
+alwaysApply: true
+---
+# Security and Compliance Guidelines
+
+- **Authentication and Authorization**:
+  - Integrate with Azure AD for user authentication.
+  - Implement role-based access control (RBAC) for all resources.
+  - Use Azure Managed Identities for service-to-service authentication.
+  - Apply principle of least privilege for all permissions.
+
+- **Data Protection**:
+  - Encrypt all sensitive data at rest and in transit.
+  - Implement proper key management with Azure Key Vault.
+  - Apply data retention policies according to compliance requirements.
+  - Handle PII according to privacy regulations (GDPR, CCPA, etc.).
+
+- **API Security**:
+  - Validate all inputs to prevent injection attacks.
+  - Implement proper CORS settings for web applications.
+  - Use Azure API Management for API security policies.
+  - Apply rate limiting to prevent abuse.
+
+- **Secure Coding**:
+  - Use parameterized queries to prevent SQL injection.
+  - Sanitize user inputs to prevent XSS attacks.
+  - Avoid including sensitive information in logs.
+  - Keep dependencies updated to prevent known vulnerabilities.

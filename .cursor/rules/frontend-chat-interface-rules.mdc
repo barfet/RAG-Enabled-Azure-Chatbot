@@ -1,0 +1,31 @@
+---
+description: Guidelines for implementing the chat interface and user experience
+globs: frontend/src/**/*.{ts,tsx,js,jsx,css,scss}
+alwaysApply: false
+---
+# Chat Interface Guidelines
+
+- **UI Components**:
+  - Create responsive design that works on desktop and mobile.
+  - Support light/dark mode following system preferences.
+  - Implement clear visual hierarchy with primary/secondary actions.
+  - Ensure all components meet WCAG AA accessibility standards.
+
+- **Chat Experience**:
+  - Show clear typing/loading indicators during response generation.
+  - Implement message threading with clear visual separation.
+  - Support rich text formatting in responses (markdown recommended).
+  - Display source citations with links to original documents.
+  - Include feedback mechanisms (thumbs up/down) for responses.
+
+- **Document Management**:
+  - Provide drag-and-drop document upload with progress indicators.
+  - Show clear document processing status and completion.
+  - Enable document categorization and organization.
+  - Include document search and filtering capabilities.
+
+- **User Experience**:
+  - Preserve chat history between sessions (local storage or server-side).
+  - Implement keyboard shortcuts for common actions.
+  - Provide clear error states with recovery options.
+  - Design for progressive enhancement with graceful degradation.

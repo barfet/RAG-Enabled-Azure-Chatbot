@@ -1,0 +1,32 @@
+---
+description: Guidelines for document processing, chunking, and embedding generation
+globs: functions/document-processing/**/*.{py,json}, functions/embedding/**/*.{py,json}
+alwaysApply: false
+---
+# Document Processing Guidelines
+
+- **Document Ingestion**:
+  - Support PDF, DOCX, TXT formats with appropriate content type validation.
+  - Enforce maximum file size limits (50MB recommended).
+  - Implement secure file handling with virus scanning.
+  - Store raw documents in Azure Blob Storage with proper access controls.
+
+- **Document Chunking**:
+  - Implement semantic chunking rather than arbitrary splits.
+  - Use recursive character text splitter with 1000 token chunks.
+  - Maintain 200 token overlap between adjacent chunks.
+  - Preserve document structure (headings, paragraphs, lists).
+  - Include document metadata with each chunk.
+
+- **Embedding Generation**:
+  - Use Azure OpenAI text-embedding-ada-002 model.
+  - Set embedding dimension to 1536.
+  - Process chunks in batches to optimize API usage.
+  - Implement retry logic for API failures.
+  - Store embedding vectors in Azure Cognitive Search.
+
+- **Processing Pipeline**:
+  - Use event-driven architecture for asynchronous processing.
+  - Track document processing status in a database or storage table.
+  - Implement comprehensive error handling with detailed logs.
+  - Create idempotent processing functions to handle retries.
