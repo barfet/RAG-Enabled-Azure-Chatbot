@@ -1,0 +1,52 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Project Structure
+
+```
+└── .cursor/
+│   ├── rules/
+│   │   ├── agent.mdc
+│   │   ├── backend-azure-functions-rules.mdc
+│   │   ├── document-processing-pipeline-rules.mdc
+│   │   ├── frontend-chat-interface-rules.mdc
+│   │   ├── infrastructure-and-devops-rules.mdc
+│   │   ├── security-and-compliance-rules.mdc
+│   │   ├── structure.mdc
+        └── vector-search-and-rag-rules.mdc
+└── .gitignore
+└── .scripts/
+    └── update_structure.sh
+└── README.md
+└── backend/
+│   ├── IndexerFunctions/
+│   │   ├── .gitignore
+│   │   ├── IndexerFunctions.csproj
+│   │   ├── Models/
+│   │   │   ├── SearchDocument.cs
+            └── WikipediaArticle.cs
+│   │   ├── README.md
+│   │   ├── Services/
+│   │   │   ├── OpenAIService.cs
+│   │   │   ├── SearchService.cs
+│   │   │   ├── TextChunker.cs
+            └── WikipediaService.cs
+│   │   ├── Startup.cs
+│   │   ├── WikipediaIndexer.cs
+        └── host.json
+└── docs/
+│   ├── Implementation.md
+│   ├── architecture.md
+│   ├── idea.md
+    └── prd.md
+└── infra/
+│   ├── README.md
+│   ├── deploy.sh
+│   ├── index-documents.js
+│   ├── index-wikipedia.js
+│   ├── main.bicep
+│   ├── package.json
+    └── search-index.json
+```
