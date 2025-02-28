@@ -3,13 +3,13 @@
 variable "prefix" {
   description = "The prefix to use for all resources in this deployment"
   type        = string
-  default     = "ragchatbot"
+  default     = "ragbot"
 }
 
 variable "location" {
   description = "The Azure region where all resources will be created"
   type        = string
-  default     = "westus"
+  default     = "eastus2"
 }
 
 variable "tags" {
@@ -61,7 +61,7 @@ variable "function_app_sku" {
     size = string
   })
   default = {
-    tier = "Standard"
-    size = "S1"
+    tier = "Dynamic"
+    size = "Y1"
   }
 } 

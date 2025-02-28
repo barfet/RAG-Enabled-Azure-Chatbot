@@ -14,14 +14,14 @@ resource "azurerm_cognitive_account" "openai" {
 }
 
 # Deploy GPT-3.5 Turbo model
-resource "azurerm_cognitive_deployment" "gpt_35_turbo" {
-  name                 = "gpt-35-turbo"
+resource "azurerm_cognitive_deployment" "gpt-4o-mini" {
+  name                 = "gpt-4o-mini"
   cognitive_account_id = azurerm_cognitive_account.openai.id
   
   model {
     format  = "OpenAI"
-    name    = "gpt-35-turbo"
-    version = "1106"
+    name    = "gpt-4o-mini"
+    version = "2024-07-18"
   }
   
   scale {

@@ -18,7 +18,7 @@ output "key" {
 }
 
 output "gpt_deployment_id" {
-  value = azurerm_cognitive_deployment.gpt_35_turbo.name
+  value = azurerm_cognitive_deployment.gpt-4o-mini.name
 }
 
 output "embedding_deployment_id" {

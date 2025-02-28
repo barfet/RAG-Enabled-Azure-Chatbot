@@ -7,12 +7,7 @@ terraform {
       version = "~> 3.80.0"
     }
   }
-  backend "azurerm" {
-    resource_group_name  = "terraform-state-rg"
-    storage_account_name = "ragchatbottfstate"
-    container_name       = "tfstate"
-    key                  = "rag-chatbot.terraform.tfstate"
-  }
+  # Using local state instead of Azure remote state
 }
 
 provider "azurerm" {
