@@ -62,7 +62,7 @@ resource "azurerm_windows_function_app" "function_app" {
     # OpenAI settings
     "OpenAI__Endpoint"                     = var.openai_endpoint
     "OpenAI__Key"                          = var.openai_key
-    "OpenAI__ChatModelDeployment"          = "gpt-35-turbo"
+    "OpenAI__ChatModelDeployment"          = "gpt-4o-mini"
     "OpenAI__EmbeddingsModelDeployment"    = "text-embedding-ada-002"
     
     # Azure Cognitive Search settings

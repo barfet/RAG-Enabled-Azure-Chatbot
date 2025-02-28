@@ -13,7 +13,7 @@ resource "azurerm_cognitive_account" "openai" {
   }
 }
 
-# Deploy GPT-3.5 Turbo model
+# Deploy GPT-4o Mini model
 resource "azurerm_cognitive_deployment" "gpt-4o-mini" {
   name                 = "gpt-4o-mini"
   cognitive_account_id = azurerm_cognitive_account.openai.id

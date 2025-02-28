@@ -3,13 +3,13 @@
 variable "prefix" {
   description = "The prefix to use for all resources in this deployment"
   type        = string
-  default     = "ragbot"
+  default     = "ragchatbot"
 }
 
 variable "location" {
   description = "The Azure region where all resources will be created"
   type        = string
-  default     = "eastus2"
+  default     = "northeurope"
 }
 
 variable "tags" {
@@ -29,9 +29,9 @@ variable "openai_model_deployment" {
     scale_type    = string
   }))
   default = {
-    "gpt-35-turbo" = {
-      model_name    = "gpt-35-turbo"
-      model_version = "0613"
+    "gpt-4o-mini" = {
+      model_name    = "gpt-4o-mini"
+      model_version = "2024-07-18"
       scale_type    = "Standard"
     },
     "text-embedding-ada-002" = {
