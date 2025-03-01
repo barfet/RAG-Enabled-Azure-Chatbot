@@ -1,124 +1,88 @@
 # RAG-Enabled Azure Chatbot
 
-A chatbot leveraging Retrieval-Augmented Generation (RAG) pattern to answer questions based on proprietary data, built on Azure services.
+A Retrieval-Augmented Generation (RAG) chatbot built on Azure services, designed to provide accurate and contextually relevant responses by leveraging both pre-trained language models and a knowledge base of Wikipedia articles.
 
 ## Architecture
 
-This project implements a RAG-enabled chatbot with the following components:
+The solution consists of two main components:
 
-- **Frontend**: React-based chat interface for user interaction
-- **Backend**: Azure Functions for API orchestration and business logic
-- **Vector Store**: Azure Cognitive Search with vector search capabilities
-- **LLM Integration**: Azure OpenAI Service for embeddings and chat completions
-- **Persistence**: Azure Cosmos DB for conversation history storage
+1. **Backend Data Ingestion Pipeline** - Processes Wikipedia articles and indexes them in Azure AI Search
+2. **Frontend Chat Interface** - Provides a user interface for interacting with the chatbot
 
-For detailed architecture information, see [docs/architecture.md](docs/architecture.md).
+### Backend Architecture
 
-## Project Structure
+The backend pipeline includes:
 
-```
-project-root/
-├── frontend/          # React frontend application (UI)
-├── backend/           # Azure Functions backend (API logic)
-├── infra/             # Infrastructure as code (Bicep)
-├── docs/              # Documentation files
-└── scripts/           # Utility scripts
-```
+- **Article Source** - Fetches Wikipedia articles from the Hugging Face API
+- **Text Chunker** - Splits articles into smaller chunks for better retrieval
+- **Embedding Generator** - Generates vector embeddings using Azure OpenAI
+- **Search Indexer** - Creates and updates an Azure AI Search index
+
+### Frontend Architecture
+
+The frontend includes:
+
+- **Chat Interface** - A web application for interacting with the chatbot
+- **RAG Service** - Handles retrieval of relevant information and generation of responses
+
+## Technologies Used
+
+- **Azure OpenAI** - For generating embeddings and chat completions
+- **Azure AI Search** - For storing and retrieving article chunks
+- **Azure Functions** - For orchestrating the data ingestion pipeline
+- **React** - For building the frontend chat interface
+- **.NET 9.0** - For implementing the backend services
 
 ## Getting Started
 
 ### Prerequisites
 
-- [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) installed and logged in
-- [Node.js](https://nodejs.org/) (v14 or later)
-- Access to an Azure subscription with permissions to create resources
-- Quota for Azure OpenAI services in your selected region
+- Azure subscription with:
+  - Azure OpenAI service
+  - Azure AI Search service
+- Hugging Face API key
+- .NET 9.0 SDK
+- Node.js and npm
 
-### Infrastructure Deployment
+### Setup
 
-1. Deploy the Azure infrastructure:
+1. Clone the repository
+2. Set up the backend (see [backend/README.md](backend/README.md))
+3. Set up the frontend (see [frontend/README.md](frontend/README.md))
 
-```bash
-# Navigate to the infrastructure directory
-cd infra
+## Development
 
-# Deploy resources using Bicep
-./deploy.sh
-```
+### Backend Development
 
-2. Index your documents:
+The backend is implemented as a .NET solution with the following projects:
 
-```bash
-# Install Node.js dependencies
-npm install
+- **WikipediaIngestion.Core** - Contains domain models and interfaces
+- **WikipediaIngestion.Infrastructure** - Contains implementations of the interfaces
+- **WikipediaIngestion.Functions** - Contains the Azure Function that orchestrates the pipeline
+- **WikipediaIngestion.UnitTests** - Contains unit tests for the components
 
-# Index documents from a directory
-npm run index -- --documents ./path/to/docs --category "Company Policies"
-```
+### Frontend Development
+
+The frontend is implemented as a React application with the following features:
+
+- Chat interface with message history
+- Integration with Azure OpenAI for generating responses
+- Integration with Azure AI Search for retrieving relevant information
+
+## Deployment
 
 ### Backend Deployment
 
-After setting up the infrastructure:
+Deploy the Azure Function to Azure:
 
 ```bash
-# Navigate to the backend directory
-cd backend
-
-# Install dependencies
-npm install
-
-# Deploy to Azure Functions
+cd backend/src/WikipediaIngestion.Functions
 func azure functionapp publish <function-app-name>
 ```
 
 ### Frontend Deployment
 
-```bash
-# Navigate to the frontend directory
-cd frontend
-
-# Install dependencies
-npm install
-
-# Build the frontend
-npm run build
-
-# Deploy to Azure Static Website
-az storage blob upload-batch -d '$web' -s ./build --account-name <storage-account-name>
-```
-
-## Development
-
-For local development:
-
-1. Run the backend locally:
-```bash
-cd backend
-npm install
-func start
-```
-
-2. Run the frontend locally:
-```bash
-cd frontend
-npm install
-npm start
-```
-
-## Security Considerations
-
-This project implements several security best practices:
-
-- All API keys and secrets are stored in Azure Key Vault
-- Azure Functions use Managed Identity to access other Azure services
-- HTTPS is enforced for all communication
-- Key rotation and secure credential management
-
-For more details, see the security guidelines in the documentation.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+Deploy the frontend to Azure Static Web Apps or another hosting service.
 
 ## License
 

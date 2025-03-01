@@ -1,41 +1,58 @@
-var builder = WebApplication.CreateBuilder(args);
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
+using WikipediaIngestion.Core.Interfaces;
+using WikipediaIngestion.Core.Services;
+using WikipediaIngestion.Infrastructure.Services;
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+var host = new HostBuilder()
+    .ConfigureFunctionsWorkerDefaults()
+    .ConfigureServices((context, services) =>
+    {
+        // Add configuration
+        var configuration = context.Configuration;
+        
+        // Register domain services
+        services.AddSingleton<ITextChunker, ParagraphTextChunker>();
+        
+        // Register infrastructure services
+        services.AddHttpClient();
+        
+        // Configure HuggingFaceArticleSource
+        services.AddSingleton<IArticleSource>(sp => 
+        {
+            var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
+            var httpClient = httpClientFactory.CreateClient();
+            var apiKey = configuration["HuggingFace:ApiKey"] ?? throw new InvalidOperationException("HuggingFace:ApiKey is not configured");
+            return new HuggingFaceArticleSource(httpClient, apiKey);
+        });
+        
+        // Configure AzureOpenAIEmbeddingGenerator
+        services.AddSingleton<IEmbeddingGenerator>(sp => 
+        {
+            var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
+            var httpClient = httpClientFactory.CreateClient();
+            var endpoint = configuration["AzureOpenAI:Endpoint"] ?? throw new InvalidOperationException("AzureOpenAI:Endpoint is not configured");
+            var deploymentName = configuration["AzureOpenAI:DeploymentName"] ?? throw new InvalidOperationException("AzureOpenAI:DeploymentName is not configured");
+            var apiKey = configuration["AzureOpenAI:ApiKey"] ?? throw new InvalidOperationException("AzureOpenAI:ApiKey is not configured");
+            var apiVersion = configuration["AzureOpenAI:ApiVersion"] ?? "2023-12-01-preview";
+            
+            return new AzureOpenAIEmbeddingGenerator(httpClient, endpoint, deploymentName, apiKey, apiVersion);
+        });
+        
+        // Configure AzureSearchIndexer
+        services.AddSingleton<ISearchIndexer>(sp => 
+        {
+            var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
+            var httpClient = httpClientFactory.CreateClient();
+            var endpoint = configuration["AzureSearch:Endpoint"] ?? throw new InvalidOperationException("AzureSearch:Endpoint is not configured");
+            var apiKey = configuration["AzureSearch:ApiKey"] ?? throw new InvalidOperationException("AzureSearch:ApiKey is not configured");
+            
+            httpClient.BaseAddress = new Uri(endpoint);
+            
+            return new AzureSearchIndexer(httpClient, apiKey);
+        });
+    })
+    .Build();
 
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
-
-app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
-
-app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
+host.Run();

@@ -8,20 +8,25 @@ namespace WikipediaIngestion.Core.Interfaces
     public interface ISearchIndexer
     {
         /// <summary>
-        /// Creates a search index if it doesn't exist
+        /// Creates a search index if it doesn't already exist
         /// </summary>
-        /// <param name="indexName">Name of the index to create</param>
-        /// <param name="cancellationToken">Cancellation token</param>
+        /// <param name="indexName">The name of the index to create</param>
+        /// <param name="cancellationToken">Optional cancellation token</param>
         /// <returns>A task representing the asynchronous operation</returns>
         Task CreateIndexIfNotExistsAsync(string indexName, CancellationToken cancellationToken = default);
         
         /// <summary>
-        /// Indexes a batch of article chunks in the search index
+        /// Uploads article chunks with their embeddings to the search index
         /// </summary>
-        /// <param name="indexName">Name of the index to add chunks to</param>
-        /// <param name="chunks">The article chunks to index</param>
-        /// <param name="cancellationToken">Cancellation token</param>
+        /// <param name="indexName">The name of the index to upload to</param>
+        /// <param name="chunks">The article chunks to upload</param>
+        /// <param name="embeddings">Dictionary mapping chunk IDs to their vector embeddings</param>
+        /// <param name="cancellationToken">Optional cancellation token</param>
         /// <returns>A task representing the asynchronous operation</returns>
-        Task IndexChunksAsync(string indexName, IEnumerable<ArticleChunk> chunks, CancellationToken cancellationToken = default);
+        Task UploadDocumentsAsync(
+            string indexName,
+            IEnumerable<ArticleChunk> chunks,
+            Dictionary<string, float[]> embeddings,
+            CancellationToken cancellationToken = default);
     }
 } 

@@ -213,15 +213,17 @@ namespace WikipediaIngestion.UnitTests
             // Assert
             Assert.NotNull(capturedRequest);
             Assert.Equal(HttpMethod.Post, capturedRequest!.Method);
+            Assert.NotNull(capturedRequest.RequestUri);
             Assert.Equal("test-api-key", capturedRequest.Headers.GetValues("api-key").First());
             Assert.Contains("deployments/test-deployment/embeddings", capturedRequest.RequestUri!.ToString());
-            Assert.Contains("api-version=test-api-version", capturedRequest.RequestUri.ToString());
+            Assert.Contains("api-version=test-api-version", capturedRequest.RequestUri!.ToString());
             
             Assert.NotNull(capturedContent);
             var requestBody = JsonConvert.DeserializeObject<dynamic>(capturedContent!);
-            Assert.Equal("text-embedding-ada-002", (string)requestBody!.model);
-            Assert.Equal(1, ((Newtonsoft.Json.Linq.JArray)requestBody.input).Count);
-            Assert.Equal("This is test chunk 1", (string)requestBody.input[0]);
+            Assert.NotNull(requestBody);
+            Assert.Equal("text-embedding-ada-002", (string?)requestBody!.model);
+            Assert.Single((Newtonsoft.Json.Linq.JArray)requestBody!.input);
+            Assert.Equal("This is test chunk 1", (string?)requestBody!.input[0]);
         }
     }
 } 
