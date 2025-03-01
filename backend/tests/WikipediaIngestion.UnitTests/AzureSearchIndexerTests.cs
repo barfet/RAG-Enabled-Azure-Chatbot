@@ -97,6 +97,7 @@ namespace WikipediaIngestion.UnitTests
             // Arrange
             var indexName = "test-index";
             var capturedRequests = new List<HttpRequestMessage>();
+            var capturedRequestContents = new List<string>();
             
             var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
             mockHttpMessageHandler.Protected()
@@ -104,9 +105,15 @@ namespace WikipediaIngestion.UnitTests
                     "SendAsync",
                     ItExpr.IsAny<HttpRequestMessage>(),
                     ItExpr.IsAny<CancellationToken>())
-                .Callback<HttpRequestMessage, CancellationToken>((request, _) => 
+                .Callback<HttpRequestMessage, CancellationToken>(async (request, cancellationToken) => 
                 {
                     capturedRequests.Add(request);
+                    
+                    // Clone content before it gets disposed
+                    if (request.Content != null)
+                    {
+                        capturedRequestContents.Add(await request.Content.ReadAsStringAsync(cancellationToken));
+                    }
                 })
                 .ReturnsAsync((HttpRequestMessage request, CancellationToken _) =>
                 {
@@ -145,8 +152,9 @@ namespace WikipediaIngestion.UnitTests
             var putRequest = capturedRequests.Last();
             Assert.Equal(HttpMethod.Put, putRequest.Method);
             
-            Assert.NotNull(putRequest.Content);
-            var content = await putRequest.Content!.ReadAsStringAsync();
+            // Use the captured content string instead of reading from the disposed content
+            Assert.NotEmpty(capturedRequestContents);
+            var content = capturedRequestContents.Last();
             var requestBody = JsonConvert.DeserializeObject<dynamic>(content);
             
             // Verify index name
@@ -185,7 +193,7 @@ namespace WikipediaIngestion.UnitTests
                     ArticleTitle = "Test Article 1",
                     Content = "This is test chunk 1",
                     SectionTitle = "Introduction",
-                    ArticleUrl = "https://wikipedia.org/Test_Article_1"
+                    ArticleUrl = new Uri("https://wikipedia.org/Test_Article_1")
                 },
                 new ArticleChunk
                 {
@@ -194,7 +202,7 @@ namespace WikipediaIngestion.UnitTests
                     ArticleTitle = "Test Article 1",
                     Content = "This is test chunk 2",
                     SectionTitle = "History",
-                    ArticleUrl = "https://wikipedia.org/Test_Article_1"
+                    ArticleUrl = new Uri("https://wikipedia.org/Test_Article_1")
                 }
             };
             
@@ -205,6 +213,7 @@ namespace WikipediaIngestion.UnitTests
             };
             
             var capturedRequest = new HttpRequestMessage();
+            var capturedContent = string.Empty;
             
             var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
             mockHttpMessageHandler.Protected()
@@ -212,9 +221,14 @@ namespace WikipediaIngestion.UnitTests
                     "SendAsync",
                     ItExpr.IsAny<HttpRequestMessage>(),
                     ItExpr.IsAny<CancellationToken>())
-                .Callback<HttpRequestMessage, CancellationToken>((request, _) => 
+                .Callback<HttpRequestMessage, CancellationToken>(async (request, cancellationToken) => 
                 {
                     capturedRequest = request;
+                    // Save content before it's disposed
+                    if (request.Content != null)
+                    {
+                        capturedContent = await request.Content.ReadAsStringAsync(cancellationToken);
+                    }
                 })
                 .ReturnsAsync(new HttpResponseMessage
                 {
@@ -239,9 +253,9 @@ namespace WikipediaIngestion.UnitTests
             Assert.Contains($"indexes/{indexName}/docs/index", capturedRequest.RequestUri!.ToString());
             Assert.Equal("test-api-key", capturedRequest.Headers.GetValues("api-key").First());
             
-            Assert.NotNull(capturedRequest.Content);
-            var content = await capturedRequest.Content!.ReadAsStringAsync();
-            var requestBody = JsonConvert.DeserializeObject<dynamic>(content);
+            // Use the captured content instead of reading from the disposed content
+            Assert.NotEmpty(capturedContent);
+            var requestBody = JsonConvert.DeserializeObject<dynamic>(capturedContent);
             Assert.NotNull(requestBody);
             var documents = (Newtonsoft.Json.Linq.JArray?)requestBody!.value;
             Assert.NotNull(documents);
@@ -290,7 +304,7 @@ namespace WikipediaIngestion.UnitTests
                     ArticleTitle = "Test Article 1",
                     Content = "This is test chunk 1",
                     SectionTitle = "Introduction",
-                    ArticleUrl = "https://wikipedia.org/Test_Article_1"
+                    ArticleUrl = new Uri("https://wikipedia.org/Test_Article_1")
                 }
             };
             

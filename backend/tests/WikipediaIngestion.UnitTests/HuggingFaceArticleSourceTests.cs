@@ -88,14 +88,14 @@ namespace WikipediaIngestion.UnitTests
             Assert.Equal("test-id-1", articlesList[0].Id);
             Assert.Equal("Test Article 1", articlesList[0].Title);
             Assert.Equal("This is test article 1 content.", articlesList[0].Content);
-            Assert.Equal("https://wikipedia.org/wiki/Test_Article_1", articlesList[0].Url);
+            Assert.Equal(new Uri("https://wikipedia.org/wiki/Test_Article_1"), articlesList[0].Url);
             Assert.Equal(new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc), articlesList[0].LastUpdated);
             Assert.Equal(new[] { "Category1", "Category2" }, articlesList[0].Categories);
             
             Assert.Equal("test-id-2", articlesList[1].Id);
             Assert.Equal("Test Article 2", articlesList[1].Title);
             Assert.Equal("This is test article 2 content.", articlesList[1].Content);
-            Assert.Equal("https://wikipedia.org/wiki/Test_Article_2", articlesList[1].Url);
+            Assert.Equal(new Uri("https://wikipedia.org/wiki/Test_Article_2"), articlesList[1].Url);
             Assert.Equal(new DateTime(2023, 1, 2, 0, 0, 0, DateTimeKind.Utc), articlesList[1].LastUpdated);
             Assert.Equal(new[] { "Category2", "Category3" }, articlesList[1].Categories);
         }

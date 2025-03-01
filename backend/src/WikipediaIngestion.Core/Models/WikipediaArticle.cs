@@ -1,10 +1,16 @@
 namespace WikipediaIngestion.Core.Models
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+
     /// <summary>
     /// Represents a Wikipedia article retrieved from Hugging Face dataset
     /// </summary>
     public class WikipediaArticle
     {
+        private readonly List<string> _categories = new List<string>();
+
         /// <summary>
         /// Unique identifier for the article
         /// </summary>
@@ -23,7 +29,7 @@ namespace WikipediaIngestion.Core.Models
         /// <summary>
         /// URL to the original Wikipedia article
         /// </summary>
-        public string Url { get; set; } = string.Empty;
+        public Uri Url { get; set; } = new Uri("https://en.wikipedia.org/");
         
         /// <summary>
         /// Last time the article was updated
@@ -33,6 +39,28 @@ namespace WikipediaIngestion.Core.Models
         /// <summary>
         /// Categories associated with the article
         /// </summary>
-        public List<string> Categories { get; set; } = new List<string>();
+        public IReadOnlyCollection<string> Categories => _categories.AsReadOnly();
+
+        /// <summary>
+        /// Adds a category to the article
+        /// </summary>
+        public void AddCategory(string category)
+        {
+            if (!string.IsNullOrEmpty(category))
+            {
+                _categories.Add(category);
+            }
+        }
+
+        /// <summary>
+        /// Adds multiple categories to the article
+        /// </summary>
+        public void AddCategories(IEnumerable<string> categories)
+        {
+            if (categories != null)
+            {
+                _categories.AddRange(categories);
+            }
+        }
     }
 } 

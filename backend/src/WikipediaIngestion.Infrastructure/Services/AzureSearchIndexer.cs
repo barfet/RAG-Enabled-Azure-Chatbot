@@ -1,4 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using WikipediaIngestion.Core.Interfaces;
 using WikipediaIngestion.Core.Models;
@@ -21,18 +27,20 @@ namespace WikipediaIngestion.Infrastructure.Services
         /// <param name="apiKey">API key for Azure AI Search</param>
         public AzureSearchIndexer(HttpClient httpClient, string apiKey)
         {
-            _httpClient = httpClient;
-            _apiKey = apiKey;
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            _apiKey = apiKey ?? throw new ArgumentNullException(nameof(apiKey));
         }
         
         /// <inheritdoc />
         public async Task CreateIndexIfNotExistsAsync(string indexName, CancellationToken cancellationToken = default)
         {
-            // Check if the index already exists
-            var request = new HttpRequestMessage(HttpMethod.Get, $"indexes/{indexName}?api-version={_apiVersion}");
-            request.Headers.Add("api-key", _apiKey);
+            ArgumentException.ThrowIfNullOrEmpty(indexName, nameof(indexName));
             
-            var response = await _httpClient.SendAsync(request, cancellationToken);
+            // Check if the index already exists
+            using var existsRequest = new HttpRequestMessage(HttpMethod.Get, $"indexes/{indexName}?api-version={_apiVersion}");
+            existsRequest.Headers.Add("api-key", _apiKey);
+            
+            var response = await _httpClient.SendAsync(existsRequest, cancellationToken).ConfigureAwait(false);
             
             // If index exists, return
             if (response.IsSuccessStatusCode)
@@ -42,17 +50,17 @@ namespace WikipediaIngestion.Infrastructure.Services
             
             // Create the index schema
             var indexSchema = CreateIndexSchema(indexName);
-            var content = new StringContent(
+            using var content = new StringContent(
                 JsonConvert.SerializeObject(indexSchema),
                 Encoding.UTF8,
                 "application/json");
             
             // Create the index
-            request = new HttpRequestMessage(HttpMethod.Put, $"indexes/{indexName}?api-version={_apiVersion}");
-            request.Headers.Add("api-key", _apiKey);
-            request.Content = content;
+            using var createRequest = new HttpRequestMessage(HttpMethod.Put, $"indexes/{indexName}?api-version={_apiVersion}");
+            createRequest.Headers.Add("api-key", _apiKey);
+            createRequest.Content = content;
             
-            response = await _httpClient.SendAsync(request, cancellationToken);
+            response = await _httpClient.SendAsync(createRequest, cancellationToken).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
         }
         
@@ -63,8 +71,12 @@ namespace WikipediaIngestion.Infrastructure.Services
             Dictionary<string, float[]> embeddings,
             CancellationToken cancellationToken = default)
         {
+            ArgumentException.ThrowIfNullOrEmpty(indexName, nameof(indexName));
+            ArgumentNullException.ThrowIfNull(chunks, nameof(chunks));
+            ArgumentNullException.ThrowIfNull(embeddings, nameof(embeddings));
+            
             var chunksList = chunks.ToList();
-            if (!chunksList.Any())
+            if (chunksList.Count == 0)
             {
                 return;
             }
@@ -86,31 +98,56 @@ namespace WikipediaIngestion.Infrastructure.Services
                     { "title", chunk.ArticleTitle },
                     { "content", chunk.Content },
                     { "section", chunk.SectionTitle },
-                    { "url", chunk.ArticleUrl },
+                    { "url", chunk.ArticleUrl.ToString() },
                     { "contentVector", embedding }
                 };
                 
                 documents.Add(document);
             }
             
-            if (!documents.Any())
+            if (documents.Count == 0)
             {
                 return;
             }
             
             // Prepare the request
             var requestBody = new { value = documents };
-            var content = new StringContent(
+            using var content = new StringContent(
                 JsonConvert.SerializeObject(requestBody),
                 Encoding.UTF8,
                 "application/json");
                 
-            var request = new HttpRequestMessage(HttpMethod.Post, $"indexes/{indexName}/docs/index?api-version={_apiVersion}");
+            using var request = new HttpRequestMessage(HttpMethod.Post, $"indexes/{indexName}/docs/index?api-version={_apiVersion}");
             request.Headers.Add("api-key", _apiKey);
             request.Content = content;
             
             // Upload the documents
-            var response = await _httpClient.SendAsync(request, cancellationToken);
+            var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
+        }
+        
+        /// <inheritdoc />
+        public async Task DeleteIndexIfExistsAsync(string indexName, CancellationToken cancellationToken = default)
+        {
+            ArgumentException.ThrowIfNullOrEmpty(indexName, nameof(indexName));
+            
+            // Check if the index exists
+            using var existsRequest = new HttpRequestMessage(HttpMethod.Get, $"indexes/{indexName}?api-version={_apiVersion}");
+            existsRequest.Headers.Add("api-key", _apiKey);
+            
+            var response = await _httpClient.SendAsync(existsRequest, cancellationToken).ConfigureAwait(false);
+            
+            // If index doesn't exist, return
+            if (!response.IsSuccessStatusCode)
+            {
+                return;
+            }
+            
+            // Delete the index
+            using var deleteRequest = new HttpRequestMessage(HttpMethod.Delete, $"indexes/{indexName}?api-version={_apiVersion}");
+            deleteRequest.Headers.Add("api-key", _apiKey);
+            
+            response = await _httpClient.SendAsync(deleteRequest, cancellationToken).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
         }
         
@@ -119,7 +156,7 @@ namespace WikipediaIngestion.Infrastructure.Services
         /// </summary>
         /// <param name="indexName">The name of the index</param>
         /// <returns>The index schema definition</returns>
-        private object CreateIndexSchema(string indexName)
+        private static object CreateIndexSchema(string indexName)
         {
             return new
             {

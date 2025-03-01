@@ -1,5 +1,7 @@
 namespace WikipediaIngestion.Core.Models
 {
+    using System;
+
     /// <summary>
     /// Represents a chunk of text from a Wikipedia article
     /// </summary>
@@ -33,6 +35,6 @@ namespace WikipediaIngestion.Core.Models
         /// <summary>
         /// URL to the original Wikipedia article
         /// </summary>
-        public string ArticleUrl { get; set; } = string.Empty;
+        public Uri ArticleUrl { get; set; } = new Uri("https://en.wikipedia.org/");
     }
 } 

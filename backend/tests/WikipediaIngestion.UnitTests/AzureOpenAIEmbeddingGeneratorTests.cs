@@ -181,7 +181,7 @@ namespace WikipediaIngestion.UnitTests
                     capturedRequest = request;
                     if (request.Content != null)
                     {
-                        capturedContent = await request.Content.ReadAsStringAsync();
+                        capturedContent = await request.Content.ReadAsStringAsync(CancellationToken.None);
                     }
                 })
                 .ReturnsAsync(new HttpResponseMessage

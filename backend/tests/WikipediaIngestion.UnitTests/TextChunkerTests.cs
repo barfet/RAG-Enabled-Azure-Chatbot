@@ -16,10 +16,10 @@ namespace WikipediaIngestion.UnitTests
                 Id = "test-id",
                 Title = "Test Article",
                 Content = string.Empty,
-                Url = "https://wikipedia.org/Test_Article",
-                LastUpdated = DateTime.UtcNow,
-                Categories = new List<string> { "Test", "Article" }
+                Url = new Uri("https://wikipedia.org/Test_Article"),
+                LastUpdated = DateTime.UtcNow
             };
+            article.AddCategories(new List<string> { "Test", "Article" });
             
             var chunker = new ParagraphTextChunker();
             
@@ -38,11 +38,11 @@ namespace WikipediaIngestion.UnitTests
             {
                 Id = "test-id",
                 Title = "Test Article",
-                Content = "This is a test article with a single paragraph.",
-                Url = "https://wikipedia.org/Test_Article",
-                LastUpdated = DateTime.UtcNow,
-                Categories = new List<string> { "Test", "Article" }
+                Content = "This is a test article with no paragraphs.",
+                Url = new Uri("https://wikipedia.org/Test_Article"),
+                LastUpdated = DateTime.UtcNow
             };
+            article.AddCategories(new List<string> { "Test", "Article" });
             
             var chunker = new ParagraphTextChunker();
             
@@ -67,11 +67,11 @@ namespace WikipediaIngestion.UnitTests
             {
                 Id = "test-id",
                 Title = "Test Article",
-                Content = "This is the first paragraph.\n\nThis is the second paragraph.\n\nThis is the third paragraph.",
-                Url = "https://wikipedia.org/Test_Article",
-                LastUpdated = DateTime.UtcNow,
-                Categories = new List<string> { "Test", "Article" }
+                Content = "First paragraph.\n\nSecond paragraph.\n\nThird paragraph.",
+                Url = new Uri("https://wikipedia.org/Test_Article"),
+                LastUpdated = DateTime.UtcNow
             };
+            article.AddCategories(new List<string> { "Test", "Article" });
             
             var chunker = new ParagraphTextChunker();
             
@@ -81,9 +81,9 @@ namespace WikipediaIngestion.UnitTests
             // Assert
             Assert.Equal(3, chunks.Count);
             
-            Assert.Equal("This is the first paragraph.", chunks[0].Content);
-            Assert.Equal("This is the second paragraph.", chunks[1].Content);
-            Assert.Equal("This is the third paragraph.", chunks[2].Content);
+            Assert.Equal("First paragraph.", chunks[0].Content);
+            Assert.Equal("Second paragraph.", chunks[1].Content);
+            Assert.Equal("Third paragraph.", chunks[2].Content);
             
             Assert.Equal($"{article.Id}-0", chunks[0].Id);
             Assert.Equal($"{article.Id}-1", chunks[1].Id);
@@ -107,11 +107,11 @@ namespace WikipediaIngestion.UnitTests
             {
                 Id = "test-id",
                 Title = "Test Article",
-                Content = "This is the introduction.\n\n== History ==\nThis is the history section.\n\n== Geography ==\nThis is the geography section.",
-                Url = "https://wikipedia.org/Test_Article",
-                LastUpdated = DateTime.UtcNow,
-                Categories = new List<string> { "Test", "Article" }
+                Content = "Introduction.\n\n== Section 1 ==\nContent in section 1.\n\n== Section 2 ==\nContent in section 2.",
+                Url = new Uri("https://wikipedia.org/Test_Article"),
+                LastUpdated = DateTime.UtcNow
             };
+            article.AddCategories(new List<string> { "Test", "Article" });
             
             var chunker = new ParagraphTextChunker();
             
@@ -121,14 +121,14 @@ namespace WikipediaIngestion.UnitTests
             // Assert
             Assert.Equal(3, chunks.Count);
             
-            Assert.Equal("This is the introduction.", chunks[0].Content);
+            Assert.Equal("Introduction.", chunks[0].Content);
             Assert.Empty(chunks[0].SectionTitle);
             
-            Assert.Equal("This is the history section.", chunks[1].Content);
-            Assert.Equal("History", chunks[1].SectionTitle);
+            Assert.Equal("Content in section 1.", chunks[1].Content);
+            Assert.Equal("Section 1", chunks[1].SectionTitle);
             
-            Assert.Equal("This is the geography section.", chunks[2].Content);
-            Assert.Equal("Geography", chunks[2].SectionTitle);
+            Assert.Equal("Content in section 2.", chunks[2].Content);
+            Assert.Equal("Section 2", chunks[2].SectionTitle);
         }
         
         [Fact]
@@ -140,10 +140,10 @@ namespace WikipediaIngestion.UnitTests
                 Id = "test-id",
                 Title = "Test Article",
                 Content = "This is the introduction.\n\n== History ==\nThis is the first paragraph of history.\n\nThis is the second paragraph of history.\n\n== Geography ==\nThis is the geography section.",
-                Url = "https://wikipedia.org/Test_Article",
-                LastUpdated = DateTime.UtcNow,
-                Categories = new List<string> { "Test", "Article" }
+                Url = new Uri("https://wikipedia.org/Test_Article"),
+                LastUpdated = DateTime.UtcNow
             };
+            article.AddCategories(new List<string> { "Test", "Article" });
             
             var chunker = new ParagraphTextChunker();
             

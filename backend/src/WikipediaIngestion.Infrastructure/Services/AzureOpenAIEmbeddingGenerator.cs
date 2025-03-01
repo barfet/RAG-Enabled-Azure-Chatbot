@@ -1,5 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using WikipediaIngestion.Core.Interfaces;
 using WikipediaIngestion.Core.Models;
@@ -33,7 +37,13 @@ namespace WikipediaIngestion.Infrastructure.Services
             string apiKey,
             string apiVersion)
         {
-            _httpClient = httpClient;
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            
+            ArgumentNullException.ThrowIfNull(endpoint, nameof(endpoint));
+            ArgumentNullException.ThrowIfNull(deploymentName, nameof(deploymentName));
+            ArgumentNullException.ThrowIfNull(apiKey, nameof(apiKey));
+            ArgumentNullException.ThrowIfNull(apiVersion, nameof(apiVersion));
+            
             _endpoint = endpoint.TrimEnd('/');
             _deploymentName = deploymentName;
             _apiKey = apiKey;
@@ -45,8 +55,10 @@ namespace WikipediaIngestion.Infrastructure.Services
             IEnumerable<ArticleChunk> chunks, 
             CancellationToken cancellationToken = default)
         {
+            ArgumentNullException.ThrowIfNull(chunks, nameof(chunks));
+            
             var chunksList = chunks.ToList();
-            if (!chunksList.Any())
+            if (chunksList.Count == 0)
             {
                 return new Dictionary<string, float[]>();
             }
@@ -73,7 +85,7 @@ namespace WikipediaIngestion.Infrastructure.Services
                 };
                 
                 var jsonContent = JsonConvert.SerializeObject(payload);
-                var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                using var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
                 
                 // Add required headers
                 using var request = new HttpRequestMessage(HttpMethod.Post, requestUrl);
@@ -81,16 +93,16 @@ namespace WikipediaIngestion.Infrastructure.Services
                 request.Headers.Add("api-key", _apiKey);
                 
                 // Send the request
-                var response = await _httpClient.SendAsync(request, cancellationToken);
+                var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
                 
                 // Ensure success response
                 response.EnsureSuccessStatusCode();
                 
                 // Read and parse the response
-                var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
+                var responseContent = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
                 var responseJson = JsonConvert.DeserializeObject<EmbeddingResponse>(responseContent);
                 
-                if (responseJson?.Data != null && responseJson.Data.Any())
+                if (responseJson?.Data != null && responseJson.Data.Length > 0)
                 {
                     // In the test, we're expecting the first chunk to have the first embedding
                     // and the second chunk to have the second embedding
@@ -104,7 +116,7 @@ namespace WikipediaIngestion.Infrastructure.Services
         /// <summary>
         /// Response structure from Azure OpenAI embedding API
         /// </summary>
-        private class EmbeddingResponse
+        private sealed class EmbeddingResponse
         {
             [JsonProperty("data")]
             public EmbeddingData[]? Data { get; set; }
@@ -113,7 +125,7 @@ namespace WikipediaIngestion.Infrastructure.Services
         /// <summary>
         /// Data structure for embedding response
         /// </summary>
-        private class EmbeddingData
+        private sealed class EmbeddingData
         {
             [JsonProperty("embedding")]
             public float[] Embedding { get; set; } = Array.Empty<float>();

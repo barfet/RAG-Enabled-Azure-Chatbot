@@ -28,5 +28,13 @@ namespace WikipediaIngestion.Core.Interfaces
             IEnumerable<ArticleChunk> chunks,
             Dictionary<string, float[]> embeddings,
             CancellationToken cancellationToken = default);
+            
+        /// <summary>
+        /// Deletes a search index if it exists
+        /// </summary>
+        /// <param name="indexName">The name of the index to delete</param>
+        /// <param name="cancellationToken">Optional cancellation token</param>
+        /// <returns>A task representing the asynchronous operation</returns>
+        Task DeleteIndexIfExistsAsync(string indexName, CancellationToken cancellationToken = default);
     }
 } 
