@@ -20,7 +20,6 @@ provider "azurerm" {
       prevent_deletion_if_contains_resources = false
     }
   }
-  skip_provider_registration = true
 }
 
 # Get current client configuration from the AzureRM provider
