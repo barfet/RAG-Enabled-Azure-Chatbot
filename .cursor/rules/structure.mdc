@@ -1,8 +1,3 @@
----
-description: 
-globs: 
-alwaysApply: false
----
 # Project Structure
 
 ```
@@ -16,37 +11,65 @@ alwaysApply: false
 │   │   ├── security-and-compliance-rules.mdc
 │   │   ├── structure.mdc
         └── vector-search-and-rag-rules.mdc
+└── .github/
+│   ├── workflows/
+│   │   ├── azure-static-web-apps-gray-moss-08bc43c03.yml
+        └── main_barfet-azure-chatbot.yml
 └── .gitignore
 └── .scripts/
     └── update_structure.sh
 └── README.md
 └── backend/
-│   ├── IndexerFunctions/
-│   │   ├── .gitignore
-│   │   ├── IndexerFunctions.csproj
-│   │   ├── Models/
-│   │   │   ├── SearchDocument.cs
-            └── WikipediaArticle.cs
+│   ├── WikipediaIngestion/
 │   │   ├── README.md
-│   │   ├── Services/
-│   │   │   ├── OpenAIService.cs
-│   │   │   ├── SearchService.cs
-│   │   │   ├── TextChunker.cs
-            └── WikipediaService.cs
-│   │   ├── Startup.cs
-│   │   ├── WikipediaIndexer.cs
-        └── host.json
+│   │   ├── src/
+│   │   │   ├── Functions/
+                └── WikipediaDataIngestionFunction.cs
+│   │   │   ├── Program.cs
+│   │   │   ├── Services/
+│   │   │   │   ├── AzureBlobStorageService.cs
+│   │   │   │   ├── AzureOpenAIEmbeddingService.cs
+│   │   │   │   ├── AzureSearchIndexService.cs
+│   │   │   │   ├── Interfaces.cs
+│   │   │   │   ├── TextProcessingService.cs
+                └── WikipediaService.cs
+│   │   │   ├── WikipediaDataIngestionFunction.csproj
+            └── host.json
+└── context_collector.py
 └── docs/
 │   ├── Implementation.md
 │   ├── architecture.md
 │   ├── idea.md
-    └── prd.md
+│   ├── prd.md
+│   ├── user-stories/
+        └── Wikipedia Data Ingestion Pipeline.md
 └── infra/
-│   ├── README.md
-│   ├── deploy.sh
-│   ├── index-documents.js
-│   ├── index-wikipedia.js
-│   ├── main.bicep
-│   ├── package.json
-    └── search-index.json
+│   ├── .terraform.lock.hcl
+│   ├── main.tf
+│   ├── modules/
+│   │   ├── cosmosdb/
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+            └── variables.tf
+│   │   ├── functions/
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+            └── variables.tf
+│   │   ├── keyvault/
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+            └── variables.tf
+│   │   ├── openai/
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+            └── variables.tf
+│   │   ├── search/
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+            └── variables.tf
+│   ├── outputs.tf
+│   ├── terraform.tfstate
+│   ├── tfplan
+    └── variables.tf
+└── requirements.txt
 ```
