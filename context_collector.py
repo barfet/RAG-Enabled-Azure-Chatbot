@@ -46,7 +46,15 @@ def collect_file_contents(folder_paths: List[str], ignore_patterns: List[str] = 
             "*.pyo",
             "*.pyd",
             ".Python",
-            "*.so"
+            "*.so",
+            "bin",
+            "obj",
+            "build",
+            "dist",
+            "*.egg-info",
+            "*.egg",
+            "*.whl",
+            
         ]
 
     result = {}
